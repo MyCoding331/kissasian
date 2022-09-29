@@ -200,35 +200,35 @@ app.get("/api/drama-detail/:id", (req, res) => {
         const img = $(this)
           .find(".col-12 >.row > .col-6 > .episode-ratio > img")
           .attr("src");
-        // const title = $(this)
-        //   .find(".col-rightx > .box > .box-header >.film-title > a")
-        //   .text();
+        const title = $(this)
+          .find(".col-rightx > .box > .box-header >.film-title > a")
+          .text();
 
-        // const status = $(this)
-        //   .find(
-        //     ".row > .col-12 > .series-details > col-12 > .status"
-        //   )
-        //   .text();
-        // const year = $(this)
-        //   .find(
-        //     ".row > .col-12 > .series-details > col-12 > .block > .text-light"
-        //   )
-        //   .text();
-        // const country = $(this)
-        //   .find(
-        //     ".row > .col-12 > .series-details > col-12 > .block > .text-light"
-        //   )
-        //   .text();
-        // const description = $(this)
-        //   .find(".box-body >.row > #show-detailsxx > .show-synopsis > p > span")
-        //   .text();
+        const status = $(this)
+          .find(
+            ".row > .col-12 > .series-details > col-12 > .status"
+          )
+          .text();
+        const year = $(this)
+          .find(
+            ".row > .col-12 > .series-details > col-12 > .block > .text-light"
+          )
+          .text();
+        const country = $(this)
+          .find(
+            ".row > .col-12 > .series-details > col-12 > .block > .text-light"
+          )
+          .text();
+        const description = $(this)
+          .find(".box-body >.row > #show-detailsxx > .show-synopsis > p > span")
+          .text();
 
         tv[index]= ({
           title,
           img,
-          // status,
-          // year,
-          // country,
+          status,
+          year,
+          country,
           description,
         }); //<-- cannot be a function expression
       });
