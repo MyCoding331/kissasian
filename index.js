@@ -121,6 +121,7 @@ app.get("/api/drama-detail/:id", (req, res) => {
 
       $("#drama-details ").each(function (index) {
         const image = $(this).find(".wrapper > .drama-thumbnail > a > img").attr("src");
+        const watchlink = $(this).find(".wrapper > .drama-thumbnail > .btn-watch ").attr("href").slice(28);
         const title = $(this).find(".wrapper > .drama-details > .entry-header > h1 ").text();
 
         const description = $(this)
@@ -128,11 +129,7 @@ app.get("/api/drama-detail/:id", (req, res) => {
 
           .text()
          
-        // const genres = $(this)
-        //   .find(".block > .details > .info > p ")
-        //   .last()
-        //   .children("a")
-        //   .attr();
+       
 
         const releaseYear = $(this)
           .find(".wrapper > .drama-details > .release-year")
@@ -164,6 +161,7 @@ app.get("/api/drama-detail/:id", (req, res) => {
           releaseYear,
           status,
           country,
+          watchlink,
          
         });
       });
