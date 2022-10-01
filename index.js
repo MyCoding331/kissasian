@@ -203,13 +203,13 @@ app.get("/api/drama-watch/:id", (req, res) => {
       const $ = cheerio.load(html);
       const watch = [];
 
-      $(".wrapper").each(function (index, i) {
+      $("#player-content").each(function (index, i) {
         const title = $(this)
-          .find(".text_above_player > h2 ")
+          .find(".heading > h1 ")
           .text();
         const frame = $(this)
           .find(
-            ".videoplayer > iframe "
+            " .wrapper > .videoplayer > iframe "
           )
           .attr("src");
         // const Download = $(this).find(".plugins2  ").children(".download").children("a").attr("href");
