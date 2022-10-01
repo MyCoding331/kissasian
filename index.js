@@ -6,6 +6,16 @@ const app = express();
 const cors = require("cors");
 
 app.use(cors());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); 
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE"); 
+  res.setHeader( 
+    "Access-Control-Allow-Methods", 
+    "Content-Type",
+    "Authorization"
+  );
+  next();
+});
 
 const baseURL = "https://kissasian.fan/";
 
@@ -207,6 +217,9 @@ app.get("/api/drama-watch/:id", (req, res) => {
         const title = $(this)
           .find(".heading > h1 ")
           .text();
+           const headingtitle = $(this)
+          .find(".wrapper > .text_above_player > h2 ")
+          .text().slice(26);
         const frame = $(this)
           .find(
             " .wrapper > .videoplayer > iframe "
@@ -214,7 +227,7 @@ app.get("/api/drama-watch/:id", (req, res) => {
           .attr("src");
         // const Download = $(this).find(".plugins2  ").children(".download").children("a").attr("href");
 
-        watch.push({ title, frame });
+        watch.push({ title,headingtitle, frame });
 
         //<-- cannot be a function expression
       });
