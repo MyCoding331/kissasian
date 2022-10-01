@@ -13,12 +13,13 @@ app.get("/", (req, res) => {
   let info = {
     popular: `http://localhost:${PORT}/api/popular/page=:page`,
     movies: `http://localhost:${PORT}/api/movies/page=:page`,
-    recentlyAadded: `http://localhost:${PORT}/api/recently-added/drama/page=:page`,
+    recentlyAadded: `http://localhost:${PORT}/api/recentlyadded/page=:page`,
     kshow: `http://localhost:${PORT}/api/kshow/page=:page`,
-    search: `http://localhost:${PORT}/api/search/:word/:page`,
-    episode_link: `http://localhost:${PORT}/api/watching/:id`,
+    search: `http://localhost:${PORT}/api/search/keyword:word/:page`,
+    watching: `http://localhost:${PORT}/api/drama-watch/:id`,
+    dramadetail: `http://localhost:${PORT}/api/drama-detail/:id`,
+    dramaepisodes: `http://localhost:${PORT}/api/drama-episodes/:id`,
 
-    recently_added: `http://localhost:${PORT}/api/recentlyadded/:page`,
   };
   res.send(info);
 });
@@ -96,55 +97,21 @@ app.get("/api/kshow/page=:page", (req, res) => {
       const $ = cheerio.load(html);
       const kshow = [];
 
-      $(".list-episode-item >li").each(function (index, element) {
-        const title = $(this).find("a").attr().title;
-        const id = $(this).find(" a").attr().href.slice(33);
-        const image = $(this).find(" a > img").attr("data-original");
-        const time = $(this).find(" a > .time").text();
-        const type = $(this).find(" a > .type").text();
-        const ep = $(this).find(" a > .ep").text();
+      $(".box  >li").each(function (index, element) {
+        const title = $(this).find(".mask ").attr().title;
+        const id = $(this).find(" .mask ").attr().href.slice(28);
+        const image = $(this).find(" .mask > img").attr("src");
+        const episodes = $(this).find(" .mask > .ep").text();
+        const  time = $(this).find(" .mask > .time").text();
 
-        kshow.push({ title, id, image, time, type, ep });
+        kshow.push({ title, id, image, time, episodes });
       });
       res.json(kshow);
     })
     .catch((err) => console.log(err));
 });
-
-app.get("/api/drama-detail-genres/:id", (req, res) => {
-  const detail = `${baseURL}${req.params.id}`;
-  axios(detail)
-    .then((response) => {
-      const html = response.data;
-      const $ = cheerio.load(html);
-      const detail = [];
-      // const episodes = [];
-
-      $(".content-left > .block > .details > .info > p ").each(function (
-        index
-      ) {
-        const genres = $(".content-left > .block > .details > .info > p ")
-          .last()
-          .find("a")
-
-          .text();
-        const id = $(".content-left > .block > .details > .info > p ")
-          .last()
-          .find("a")
-
-          .attr("href");
-
-        detail.push({
-          genres,
-          id,
-        });
-      });
-      res.json(detail);
-    })
-    .catch((err) => console.log(err));
-});
 app.get("/api/drama-detail/:id", (req, res) => {
-  const detail = `${baseURL}Drama/${req.params.id}`;
+  const detail = `${baseURL}movie/${req.params.id}`;
   axios(detail)
     .then((response) => {
       const html = response.data;
@@ -152,15 +119,15 @@ app.get("/api/drama-detail/:id", (req, res) => {
       const detail = [];
       // const episodes = [];
 
-      $(".space-top ").each(function (index) {
-        const image = $(this).find(".section > .cover > img").attr("src");
-        const title = $(this).find(".gold >.heading > h3 ").text();
+      $("#drama-details ").each(function (index) {
+        const image = $(this).find(".wrapper > .drama-thumbnail > a > img").attr("src");
+        const title = $(this).find(".wrapper > .drama-details > .entry-header > h1 ").text();
 
         const description = $(this)
-          .find(".section > .info > .summary1")
+          .find(".wrapper > .drama-details > .synopsis > p")
 
           .text()
-          .slice(21, -17);
+         
         // const genres = $(this)
         //   .find(".block > .details > .info > p ")
         //   .last()
@@ -168,81 +135,44 @@ app.get("/api/drama-detail/:id", (req, res) => {
         //   .attr();
 
         const releaseYear = $(this)
-          .find(".section > .info  > p ")
-          .first()
+          .find(".wrapper > .drama-details > .release-year")
+         
 
-          .next()
-
-          .text()
-          .slice(32, -17);
+          .text().slice(39,-24)
+          
 
         const status = $(this)
-          .find(".section > .info  > p ")
-          .first()
-
-          .next()
-          .next()
-
-          .text()
-          .slice(29, -17);
+          .find(".wrapper > .drama-details > .status")
+        
+          .text().slice(33,-20)
+         
         const country = $(this)
-          .find(".section > .info  > a")
+          .find(".wrapper > .drama-details > .country")
 
-          .text();
-        const views = $(this)
-          .find(".section > .info  > p ")
-          .first()
-
-          .next()
-          .next()
-          .next()
-
-          .text()
-          .slice(29, -17);
+          .text().slice(57,-24);
+        const genres = $(this)
+          .find(".wrapper > .drama-details > .genres")
+          
+          .text().slice(57,-24)
+          
 
         detail.push({
           title,
           image,
           description,
-          // genres,
+          genres,
           releaseYear,
           status,
           country,
-          views,
+         
         });
       });
       res.json(detail);
     })
     .catch((err) => console.log(err));
 });
-app.get("/api/drama-detail-cast/:id", (req, res) => {
-  const detailCast = `${baseURL}Drama/${req.params.id}`;
-  axios(detailCast)
-    .then((response) => {
-      const html = response.data;
-      const $ = cheerio.load(html);
-      const detailCast = [];
-      // const episodes = [];
-
-      $(".list-actor > .item").each(function (index) {
-        const image = $(this).find(".actor-ava").attr("style").slice(21, -1);
-        const castName = $(this).find(".actor-info > a").text();
-
-        const id = $(this).find(".actor-ava").attr("href").slice(7);
-
-        detailCast[index] = {
-          castName,
-          image,
-          id,
-        };
-      });
-      res.json(detailCast);
-    })
-    .catch((err) => console.log("Fuck off"));
-});
-
 app.get("/api/drama-episodes/:id", (req, res) => {
-  const episodes = `${baseURL}Drama/${req.params.id}`;
+  const episodes = `${baseURL}movie/${req.params.id}`;
   axios(episodes)
     .then((response) => {
       const html = response.data;
@@ -250,9 +180,9 @@ app.get("/api/drama-episodes/:id", (req, res) => {
 
       const episodes = [];
 
-      $(".list > .episodeSub ").each(function (index) {
-        const id = $(this).children("a").attr("href").slice(7);
-        const episode = $(this).find("a > span").text();
+      $("#all-episodes > .list > li ").each(function (index) {
+        const id = $(this).find("h3 > a ").attr("href").slice(28);
+        const episode = $(this).find("h3 > a").attr("title");
 
         episodes.push({
           id,
@@ -266,31 +196,8 @@ app.get("/api/drama-episodes/:id", (req, res) => {
     })
     .catch((err) => console.log(err));
 });
-app.get("/api/drama-watch-servers/:id", (req, res) => {
-  const watching = `${baseURL}${req.params.id}`;
-  axios(watching)
-    .then((response) => {
-      const html = response.data;
-      const $ = cheerio.load(html);
-      const servers = [];
-
-      $(".anime_muti_link > ul > li ").each(function (index, i) {
-        const title = $(this).children().remove().end().text();
-        const frame = $(this).attr("data-video");
-        // const Download = $(this).find(".plugins2  ").children(".download").children("a").attr("href");
-
-        servers[index] = { title, frame };
-
-        //<-- cannot be a function expression
-      });
-
-      res.json({ servers });
-    })
-    .catch((err) => console.log(err));
-});
-
-app.get("/api/drama-watch/", (req, res) => {
-  const moviewatch = `https://keephealth.info/p/fda-approved-weight-loss-pills-over-the-counter?sig=U2NhcmxldC1IZWFydC1SeWVvfHx8RXBpc29kZS0xfHx8MTY2NDM2Mzk1OQ==&id=30070&op=swa`;
+app.get("/api/drama-watch/:id", (req, res) => {
+  const moviewatch = `${baseURL}movie/${req.params.id}`;
 
   axios(moviewatch)
     .then((response) => {
@@ -298,18 +205,18 @@ app.get("/api/drama-watch/", (req, res) => {
       const $ = cheerio.load(html);
       const watch = [];
 
-      $(".main > .wrap").each(function (index, i) {
+      $(".wrapper").each(function (index, i) {
         const title = $(this)
-          .find(".space-top > .gold > .heading > h3 ")
+          .find(".text_above_player > h2 ")
           .text();
         const frame = $(this)
           .find(
-            ".space-top > .video-container > #mVideo > #document > html > body > #vstr > .jw-wrapper > .jw-media  > .jw-video "
+            ".videoplayer > iframe "
           )
           .attr("src");
         // const Download = $(this).find(".plugins2  ").children(".download").children("a").attr("href");
 
-        watch[index] = { title, frame };
+        watch.push({ title, frame });
 
         //<-- cannot be a function expression
       });
@@ -319,7 +226,7 @@ app.get("/api/drama-watch/", (req, res) => {
     .catch((err) => console.log(err));
 });
 app.get("/api/search/keyword=:word/page=:page", (req, res) => {
-  const search = `${baseURL}page/${req.params.page}?type=movies&s=${req.params.word}`;
+  const search = `${baseURL}page/${req.params.page}?s=${req.params.word}`;
 
   axios(search)
     .then((response) => {
@@ -327,13 +234,14 @@ app.get("/api/search/keyword=:word/page=:page", (req, res) => {
       const $ = cheerio.load(html);
       const search = [];
 
-      $(".list-episode-item >li").each(function (index, element) {
-        const title = $(this).find("a").attr().title;
-        const id = $(this).find(" a").attr().href.slice(28);
-        const image = $(this).find(" a > img").attr("data-original");
-        const type = $(this).find(" a > .type").text();
+      $(".list-thumb >li").each(function (index, element) {
+        const title = $(this).find(".post-thumbnail > a > img ").attr().title;
+        const id = $(this).find(" .post-thumbnail > a  ").attr().href.slice(28);
+        const image = $(this).find(".post-thumbnail > a > img ").attr("src");
+        const type = $(this).find(".post-details > .post-cat > span > .post-categories > a").text();
+        const year = $(this).find(".post-details > .post-info ").text().slice(32,-7);
 
-        search.push({ title, id, image, type });
+        search.push({ title, id, image, type,year });
       });
       res.json(search);
     })
