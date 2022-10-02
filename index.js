@@ -99,7 +99,7 @@ app.get("/api/movies/page=:page", (req, res) => {
     .catch((err) => console.log(err));
 });
 app.get("/api/kshow/page=:page", (req, res) => {
-  const kshow = `${baseURL}recently-added-kshow?page=${req.params.page}`;
+  const kshow = `${baseURL}k-shows/page/${req.params.page}`;
 
   axios(kshow)
     .then((response) => {
