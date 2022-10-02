@@ -246,7 +246,7 @@ app.get("/api/search/keyword=:word/page=:page", (req, res) => {
       const search = [];
 
       $(".list-thumb >li").each(function (index, element) {
-        const title = $(this).find(".post-thumbnail > a > img ").attr().title;
+        const title = $(this).find(".post-details >  h2 > a ").text();
         const id = $(this).find(" .post-thumbnail > a  ").attr().href.slice(28);
         const image = $(this).find(".post-thumbnail > a > img ").attr("src");
         const type = $(this).find(".post-details > .post-cat > span > .post-categories > a").text();
